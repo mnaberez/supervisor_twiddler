@@ -20,7 +20,7 @@ here = os.path.abspath(os.path.normpath(os.path.dirname(__file__)))
 
 DESC = """\
 supervisor_twiddler is an RPC extension for the supervisor2 package that
-facilitiates manipulation of supervisor's configuration and state in ways 
+facilitates manipulation of supervisor's configuration and state in ways 
 that are not normally accessible at runtime."""
 
 CLASSIFIERS = [
