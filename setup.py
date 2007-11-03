@@ -27,7 +27,7 @@ CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: No Input/Output (Daemon)',
     'Intended Audience :: System Administrators',
-    'License :: Proprietary',
+    'License :: OSI Approved :: BSD License',
     'Natural Language :: English',
     'Operating System :: POSIX',
     'Topic :: System :: Boot',
