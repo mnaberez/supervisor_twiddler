@@ -127,9 +127,7 @@ class TwiddlerNamespaceRPCInterface:
             raise RPCError(Faults.STILL_RUNNING, process_name)
 
         group.transition()
-        
-        # XXX finish me
-        
+
         del group.processes[process_name]
         return True
 
