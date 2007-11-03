@@ -302,7 +302,7 @@ class TestRPCInterface(unittest.TestCase):
         except supervisor.xmlrpc.RPCError, inst:
             self.assertEqual(inst.code, code)
         else:
-            fail('RPCError was never raised')
+            self.fail('RPCError was never raised')
 
     def assertTrue(self, obj):
         self.assert_(obj is True)
