@@ -29,6 +29,32 @@ Usage
   that supervisor_twiddler provides. After restarting supervisord, the changes
   made by supervisor_twiddler will not persist.
 
+  This Python interpreter session demonstrates the usage:
+  
+  >>> from xmlrpclib import Server
+  >>> s = Server('http://localhost:9001')
+  >>> s.twiddler.getAPIVersion()
+  '1.0'
+  >>> s.twiddler.addGroup('dynamic_procs', 999)
+  True
+  >>> s.twiddler.addProcessToGroup('dynamic_procs', 'ls', {'command':'ls -l', 
+  ... 'autostart':'false', 'autorestart':'false', 'startsecs':'0'})
+  True
+  >>> s.supervisor.startProcess('dynamic_procs:ls')
+  True
+  >>> s.supervisor.readProcessLog('dynamic_procs:ls', 0, 50)
+  'total 0\ndrwxr-xr-x   9 mnaberez  mnaberez  306 Nov'
+
+  In the session above, a new process group called "dynamic_procs" was created
+  and a process called "ls" was added to it.  
+  
+  The process was configured to not start automatically ("autostart"), not
+  restart automatically ("autorestart"), and "startsecs" was set to zero so
+  Supervisor would not think its quick termination was an error.
+  
+  The process was then started and its output read using the normal API commands 
+  provided by Supervisor.
+
 API
 
   Testing the API Version
@@ -102,6 +128,13 @@ API
     state machine (almost immediately).  You might want to set "autostart"
     to "false" and then start the process with supervisor.startProcess().
     
+    Similarly, you might want to set "autorestart" to "false" if you don't
+    want Supervisor to restart it immediately after it exits.
+
+    If the process you are adding exits quickly, make sure that you set
+    "startsecs" to 0.  Otherwise, Supervisor will think the process failed
+    to start and will give an abnormal termination error.
+  
   Removing a Process from a Group
 
     When processes are no longer needed in the supervisord runtime configuration,
