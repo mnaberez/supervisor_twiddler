@@ -5,7 +5,7 @@ supervisor_twiddler:
 
 History
  
-  Not yet released.
+  11/5/2007: First release. 
 
 Installation
 
