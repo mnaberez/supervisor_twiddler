@@ -7,7 +7,7 @@ from supervisor.xmlrpc import Faults as SupervisorFaults
 from supervisor.xmlrpc import RPCError
 from supervisor.http import NOT_DONE_YET
 
-API_VERSION = '1.0'
+API_VERSION = '0.1'
 
 class Faults:
     STILL_RUNNING = 220
