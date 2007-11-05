@@ -13,8 +13,10 @@ class Faults:
     STILL_RUNNING = 220
 
 class TwiddlerNamespaceRPCInterface:
-    """ A supervisor rpc interface for twiddling """
-
+    """ A supervisor rpc interface that facilitates manipulation of 
+    supervisor's configuration and state in ways that are not 
+    normally accessible at runtime.
+    """
     def __init__(self, supervisord):
         self.supervisord = supervisord
 
