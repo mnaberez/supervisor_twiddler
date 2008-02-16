@@ -85,7 +85,7 @@ class TwiddlerNamespaceRPCInterface:
         @return boolean              Always True unless error
         """
         self._update('addProcessToGroup')
-
+        
         group = self._getProcessGroup(group_name)
 
         # check process_name does not already exist in the group
@@ -97,17 +97,22 @@ class TwiddlerNamespaceRPCInterface:
         section_name = 'program:%s' % process_name
         parser = self._makeConfigParser(section_name, poptions)
 
-        # make programs list from parser instance 
+        # make program configs from parser instance, get first (only) one
         options = self.supervisord.options
         try:
-            programs = options.processes_from_section(parser, section_name, group_name)
+            configs = options.processes_from_section(parser, section_name, group_name)
+            config = configs[0]
         except ValueError, why:
             raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why[0])
 
-        # make process and add
-        config = programs[0]
-        config.create_autochildlogs() # XXX hack
-        group.processes[process_name] = config.make_process(group)
+        # add process config and process
+        group.config.process_configs.append(config)
+
+        # the process group config already exists and its after_setuid hook 
+        # will not be called again to make the auto child logs for this process.
+        config.create_autochildlogs()
+        
+        group.processes[process_name] = config.make_process(group)        
         return True
 
     def removeProcessFromGroup(self, group_name, process_name):
@@ -130,7 +135,14 @@ class TwiddlerNamespaceRPCInterface:
 
         group.transition()
 
+        # del process config from group
+        for index, config in enumerate(group.config.process_configs):
+            if config.name == process_name:
+                del group.config.process_configs[index]
+        
+        # del process
         del group.processes[process_name]
+
         return True
 
     def _getProcessGroup(self, name):

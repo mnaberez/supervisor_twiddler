@@ -1,0 +1,9 @@
+Next Release
+
+  Fixed a bug in addProcessToGroup() where the process config was
+  not added to the group properly.  Thanks to Roger Hoover for 
+  noticing this.
+  
+0.1 (5-Nov-2007)
+
+  First release.

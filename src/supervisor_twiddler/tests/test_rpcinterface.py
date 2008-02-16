@@ -203,6 +203,25 @@ class TestRPCInterface(unittest.TestCase):
 
         self.assertType(supervisor.process.Subprocess, process)
         self.assertEqual('/usr/bin/find /', process.config.command)
+
+    def test_addProcessToGroup_adds_new_process_config_to_group(self):
+        pconfig = DummyPConfig(None, 'foo', '/bin/foo')
+        gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
+        pgroup = DummyProcessGroup(gconfig)   
+        pgroup.processes = {}
+        
+        supervisord = DummySupervisor(process_groups = {'group_name': pgroup})
+        supervisord.options = supervisor.options.ServerOptions()
+        
+        interface = self.makeOne(supervisord)
+    
+        poptions = {'command': '/usr/bin/find /'}
+        self.assertTrue(interface.addProcessToGroup('group_name', 'new_process', poptions))
+        self.assertEqual('addProcessToGroup', interface.update_text)
+    
+        config = pgroup.config.process_configs[1]
+        self.assertEqual('new_process', config.name)
+        self.assertType(supervisor.options.ProcessConfig, config)
     
     # API Method twiddler.removeProcessFromGroup()
 
