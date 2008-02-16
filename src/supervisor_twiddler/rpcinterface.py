@@ -76,43 +76,46 @@ class TwiddlerNamespaceRPCInterface:
         self.supervisord.process_groups[name] = group
         return True
 
-    def addProcessToGroup(self, group_name, process_name, poptions):
-        """ Add a process to a process group.
+    def addProcessToGroup(self, group_name, program_name, program_options):
+        """ Add a new program (one or more processes) to an existing process group.
 
-        @param string  group_name    Name of an existing process group
-        @param string  process_name  Name of the new process in the process table
-        @param struct  poptions      Program options, same as in supervisord.conf
-        @return boolean              Always True unless error
+        @param string  group_name       Name of an existing process group
+        @param string  program_name     Name of the new process in the process table
+        @param struct  program_options  Program options, same as in supervisord.conf
+        @return boolean                 Always True unless error
         """
         self._update('addProcessToGroup')
         
         group = self._getProcessGroup(group_name)
 
-        # check process_name does not already exist in the group
-        for config in group.config.process_configs:
-            if config.name == process_name:
-                raise RPCError(SupervisorFaults.BAD_NAME)
-
         # make configparser instance for program options
-        section_name = 'program:%s' % process_name
-        parser = self._makeConfigParser(section_name, poptions)
+        section_name = 'program:%s' % program_name
+        parser = self._makeConfigParser(section_name, program_options)
 
-        # make program configs from parser instance, get first (only) one
+        # make process configs from parser instance
         options = self.supervisord.options
         try:
-            configs = options.processes_from_section(parser, section_name, group_name)
-            config = configs[0]
+            new_configs = options.processes_from_section(parser, section_name, group_name)
         except ValueError, why:
-            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why[0])
+            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why)
 
-        # add process config and process
-        group.config.process_configs.append(config)
+        # check new process names don't already exist in the config
+        for new_config in new_configs:
+            for existing_config in group.config.process_configs:
+                if new_config.name == existing_config.name:
+                    raise RPCError(SupervisorFaults.BAD_NAME, new_config.name)
 
-        # the process group config already exists and its after_setuid hook 
-        # will not be called again to make the auto child logs for this process.
-        config.create_autochildlogs()
-        
-        group.processes[process_name] = config.make_process(group)        
+        # add process configs to group
+        group.config.process_configs.extend(new_configs)
+
+        for new_config in new_configs:
+            # the process group config already exists and its after_setuid hook 
+            # will not be called again to make the auto child logs for this process.
+            new_config.create_autochildlogs()
+
+            # add process instance
+            group.processes[new_config.name] = new_config.make_process(group)
+
         return True
 
     def removeProcessFromGroup(self, group_name, process_name):

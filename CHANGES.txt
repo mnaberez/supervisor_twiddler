@@ -4,6 +4,10 @@ Next Release
   not added to the group properly.  Thanks to Roger Hoover for 
   noticing this.
   
+  The addProcessToGroup() method now supports program definitions
+  with numprocs > 1 and will add all resulting processes from the
+  program definition.  Requested by Roger Hoover.
+  
 0.1 (5-Nov-2007)
 
   First release.
