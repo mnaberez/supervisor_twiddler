@@ -97,15 +97,17 @@ class TwiddlerNamespaceRPCInterface:
         self.supervisord.process_groups[name] = group
         return True
 
-    def addProcessToGroup(self, group_name, program_name, program_options):
-        """ Add a new program (one or more processes) to an existing process group.
+    def addProgramToGroup(self, group_name, program_name, program_options):
+        """ Add a new program to an existing process group.  Depending on the
+            numprocs option, this will result in one or more processes being
+            added to the group.
 
         @param string  group_name       Name of an existing process group
         @param string  program_name     Name of the new process in the process table
         @param struct  program_options  Program options, same as in supervisord.conf
         @return boolean                 Always True unless error
         """
-        self._update('addProcessToGroup')
+        self._update('addProgramToGroup')
         
         group = self._getProcessGroup(group_name)
 
@@ -140,7 +142,10 @@ class TwiddlerNamespaceRPCInterface:
         return True
 
     def removeProcessFromGroup(self, group_name, process_name):
-        """ Remove a process from a process group.
+        """ Remove a process from a process group.  When a program is added with
+            addProgramToGroup(), one or more processes for that program is added
+            to the group.  This method removes individual processes (named by the 
+            numprocs and process_name options), not programs.
 
         @param string group_name    Name of an existing process group
         @param string process_name  Name of the process to remove from group

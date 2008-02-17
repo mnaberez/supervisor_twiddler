@@ -130,9 +130,9 @@ class TestRPCInterface(unittest.TestCase):
         self.assertEquals(42, config.priority)
         self.assertEquals([], config.process_configs)
     
-    # API Method twiddler.addProcessToGroup()
+    # API Method twiddler.addProgramToGroup()
     
-    def test_addProcessToGroup_raises_bad_name_when_group_doesnt_exist(self):
+    def test_addProgramToGroup_raises_bad_name_when_group_doesnt_exist(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)
@@ -141,10 +141,10 @@ class TestRPCInterface(unittest.TestCase):
         interface = self.makeOne(supervisord)
         
         self.assertRPCError(SupervisorFaults.BAD_NAME,
-                            interface.addProcessToGroup,
+                            interface.addProgramToGroup,
                             'nonexistant_group', 'foo', {})
     
-    def test_addProcessToGroup_raises_bad_name_when_process_already_exists(self):
+    def test_addProgramToGroup_raises_bad_name_when_process_already_exists(self):
         pconfig = DummyPConfig(None, 'process_that_exists', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)
@@ -155,10 +155,10 @@ class TestRPCInterface(unittest.TestCase):
 
         poptions = {'command': '/usr/bin/find /'}        
         self.assertRPCError(SupervisorFaults.BAD_NAME,
-                            interface.addProcessToGroup,
+                            interface.addProgramToGroup,
                             'group_name', 'process_that_exists', poptions)
     
-    def test_addProcessToGroup_raises_incorrect_params_when_poptions_is_not_dict(self):
+    def test_addProgramToGroup_raises_incorrect_params_when_poptions_is_not_dict(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)   
@@ -169,10 +169,10 @@ class TestRPCInterface(unittest.TestCase):
     
         bad_poptions = 42
         self.assertRPCError(SupervisorFaults.INCORRECT_PARAMETERS,
-                            interface.addProcessToGroup,
+                            interface.addProgramToGroup,
                             'group_name', 'new_process', bad_poptions)
     
-    def test_addProcessToGroup_raises_incorrect_params_when_poptions_is_invalid(self):
+    def test_addProgramToGroup_raises_incorrect_params_when_poptions_is_invalid(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)   
@@ -184,10 +184,10 @@ class TestRPCInterface(unittest.TestCase):
 
         poptions_missing_command = {}
         self.assertRPCError(SupervisorFaults.INCORRECT_PARAMETERS,
-                            interface.addProcessToGroup,
+                            interface.addProgramToGroup,
                             'group_name', 'new_process', poptions_missing_command)        
     
-    def test_addProcessToGroup_adds_new_process_to_supervisord_processes(self):
+    def test_addProgramToGroup_adds_new_process_to_supervisord_processes(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)   
@@ -199,15 +199,15 @@ class TestRPCInterface(unittest.TestCase):
         interface = self.makeOne(supervisord)
     
         poptions = {'command': '/usr/bin/find /'}
-        self.assertTrue(interface.addProcessToGroup('group_name', 'new_process', poptions))
-        self.assertEqual('addProcessToGroup', interface.update_text)
+        self.assertTrue(interface.addProgramToGroup('group_name', 'new_process', poptions))
+        self.assertEqual('addProgramToGroup', interface.update_text)
     
         process = pgroup.processes['new_process']
 
         self.assertType(supervisor.process.Subprocess, process)
         self.assertEqual('/usr/bin/find /', process.config.command)
 
-    def test_addProcessToGroup_adds_new_process_config_to_group(self):
+    def test_addProgramToGroup_adds_new_process_config_to_group(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)   
@@ -219,14 +219,14 @@ class TestRPCInterface(unittest.TestCase):
         interface = self.makeOne(supervisord)
     
         poptions = {'command': '/usr/bin/find /'}
-        self.assertTrue(interface.addProcessToGroup('group_name', 'new_process', poptions))
-        self.assertEqual('addProcessToGroup', interface.update_text)
+        self.assertTrue(interface.addProgramToGroup('group_name', 'new_process', poptions))
+        self.assertEqual('addProgramToGroup', interface.update_text)
     
         config = pgroup.config.process_configs[1]
         self.assertEqual('new_process', config.name)
         self.assertType(supervisor.options.ProcessConfig, config)
     
-    def test_addProcessToGroup_uses_process_name_from_options(self):
+    def test_addProgramToGroup_uses_process_name_from_options(self):
         gconfig = DummyPGroupConfig(None, pconfigs=[])
         pgroup = DummyProcessGroup(gconfig)   
         pgroup.processes = {}
@@ -237,15 +237,15 @@ class TestRPCInterface(unittest.TestCase):
         interface = self.makeOne(supervisord)
     
         poptions = {'process_name': 'renamed', 'command': '/usr/bin/find /'}
-        self.assertTrue(interface.addProcessToGroup('group_name', 'new_process', poptions))
-        self.assertEqual('addProcessToGroup', interface.update_text)
+        self.assertTrue(interface.addProgramToGroup('group_name', 'new_process', poptions))
+        self.assertEqual('addProgramToGroup', interface.update_text)
     
         config = pgroup.config.process_configs[0]
         self.assertEqual('renamed', config.name)
         self.assertNone(pgroup.processes.get('new_process'))
         self.assertType(supervisor.process.Subprocess, pgroup.processes.get('renamed'))
 
-    def test_addProcessToGroup_adds_all_processes_resulting_from_program_options(self):
+    def test_addProgramToGroup_adds_all_processes_resulting_from_program_options(self):
         gconfig = DummyPGroupConfig(None, pconfigs=[])
         pgroup = DummyProcessGroup(gconfig)   
         pgroup.processes = {}
@@ -258,8 +258,8 @@ class TestRPCInterface(unittest.TestCase):
         poptions = {'command': '/usr/bin/find /', 
                     'process_name': 'find_%(process_num)d',
                     'numprocs': 3}
-        self.assertTrue(interface.addProcessToGroup('group_name', 'new_process', poptions))
-        self.assertEqual('addProcessToGroup', interface.update_text)
+        self.assertTrue(interface.addProgramToGroup('group_name', 'new_process', poptions))
+        self.assertEqual('addProgramToGroup', interface.update_text)
 
         self.assertEqual(3, len(pgroup.config.process_configs))
         self.assertEqual(3, len(pgroup.processes))
