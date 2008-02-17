@@ -1,4 +1,4 @@
-0.2 (16-Feb-2007)
+0.2 (16-Feb-2008)
 
   Renamed addProcessToGroup() to addProgramToGroup().  The method
   now supports program definitions with numprocs > 1 and will add 
