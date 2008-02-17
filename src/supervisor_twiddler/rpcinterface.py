@@ -6,6 +6,7 @@ from supervisor.supervisord import SupervisorStates
 from supervisor.xmlrpc import Faults as SupervisorFaults
 from supervisor.xmlrpc import RPCError
 from supervisor.http import NOT_DONE_YET
+import supervisor.loggers
 
 API_VERSION = '0.1'
 
@@ -48,6 +49,26 @@ class TwiddlerNamespaceRPCInterface:
         self._update('getGroupNames')
         return self.supervisord.process_groups.keys()
 
+    def log(self, message, level=supervisor.loggers.LevelsByName.INFO):
+        """ Write an arbitrary message to the main supervisord log.  This is 
+            useful for recording information about your twiddling.
+        
+        @param  string      message      Message to write to the log
+        @param  string|int  level        Log level name (INFO) or code (20)
+        @return boolean                  Always True unless error
+        """
+        self._update('log')
+
+        if isinstance(level, str):
+            level = getattr(supervisor.loggers.LevelsByName, 
+                            level.upper(), None)
+
+        if supervisor.loggers.LOG_LEVELS_BY_NUM.get(level, None) is None:
+            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS)
+        
+        self.supervisord.options.logger.log(level, message)
+        return True
+
     def addGroup(self, name, priority):
         """ Add a new, empty process group.
         
@@ -76,42 +97,55 @@ class TwiddlerNamespaceRPCInterface:
         self.supervisord.process_groups[name] = group
         return True
 
-    def addProcessToGroup(self, group_name, process_name, poptions):
-        """ Add a process to a process group.
+    def addProgramToGroup(self, group_name, program_name, program_options):
+        """ Add a new program to an existing process group.  Depending on the
+            numprocs option, this will result in one or more processes being
+            added to the group.
 
-        @param string  group_name    Name of an existing process group
-        @param string  process_name  Name of the new process in the process table
-        @param struct  poptions      Program options, same as in supervisord.conf
-        @return boolean              Always True unless error
+        @param string  group_name       Name of an existing process group
+        @param string  program_name     Name of the new process in the process table
+        @param struct  program_options  Program options, same as in supervisord.conf
+        @return boolean                 Always True unless error
         """
-        self._update('addProcessToGroup')
-
+        self._update('addProgramToGroup')
+        
         group = self._getProcessGroup(group_name)
 
-        # check process_name does not already exist in the group
-        for config in group.config.process_configs:
-            if config.name == process_name:
-                raise RPCError(SupervisorFaults.BAD_NAME)
-
         # make configparser instance for program options
-        section_name = 'program:%s' % process_name
-        parser = self._makeConfigParser(section_name, poptions)
+        section_name = 'program:%s' % program_name
+        parser = self._makeConfigParser(section_name, program_options)
 
-        # make programs list from parser instance 
+        # make process configs from parser instance
         options = self.supervisord.options
         try:
-            programs = options.processes_from_section(parser, section_name, group_name)
+            new_configs = options.processes_from_section(parser, section_name, group_name)
         except ValueError, why:
-            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why[0])
+            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why)
 
-        # make process and add
-        config = programs[0]
-        config.create_autochildlogs() # XXX hack
-        group.processes[process_name] = config.make_process(group)
+        # check new process names don't already exist in the config
+        for new_config in new_configs:
+            for existing_config in group.config.process_configs:
+                if new_config.name == existing_config.name:
+                    raise RPCError(SupervisorFaults.BAD_NAME, new_config.name)
+
+        # add process configs to group
+        group.config.process_configs.extend(new_configs)
+
+        for new_config in new_configs:
+            # the process group config already exists and its after_setuid hook 
+            # will not be called again to make the auto child logs for this process.
+            new_config.create_autochildlogs()
+
+            # add process instance
+            group.processes[new_config.name] = new_config.make_process(group)
+
         return True
 
     def removeProcessFromGroup(self, group_name, process_name):
-        """ Remove a process from a process group.
+        """ Remove a process from a process group.  When a program is added with
+            addProgramToGroup(), one or more processes for that program is added
+            to the group.  This method removes individual processes (named by the 
+            numprocs and process_name options), not programs.
 
         @param string group_name    Name of an existing process group
         @param string process_name  Name of the process to remove from group
@@ -130,7 +164,14 @@ class TwiddlerNamespaceRPCInterface:
 
         group.transition()
 
+        # del process config from group
+        for index, config in enumerate(group.config.process_configs):
+            if config.name == process_name:
+                del group.config.process_configs[index]
+        
+        # del process
         del group.processes[process_name]
+
         return True
 
     def _getProcessGroup(self, name):
