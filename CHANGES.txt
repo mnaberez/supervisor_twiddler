@@ -8,6 +8,10 @@ Next Release
   with numprocs > 1 and will add all resulting processes from the
   program definition.  Requested by Roger Hoover.
   
+  Added new method log() that writes an arbitrary message to the 
+  main supervisord log.  This is useful for recording information 
+  about your twiddling.
+  
 0.1 (5-Nov-2007)
 
   First release.

@@ -338,6 +338,40 @@ class TestRPCInterface(unittest.TestCase):
         self.assertNone(pgroup.processes.get('process_name'))
         self.assertEqual('removeProcessFromGroup', interface.update_text)
 
+    # API Method twiddler.log()
+    
+    def test_log_write_message_when_level_is_string(self):
+        supervisord = DummySupervisor()        
+        interface = self.makeOne(supervisord)
+
+        result = interface.log('hello', 'info')
+        self.assertTrue(result)
+        result = interface.log('there', 'INFO')
+        self.assertTrue(result)
+        self.assertEqual('log', interface.update_text)
+
+        logger = supervisord.options.logger
+        self.assertEqual(['hello', 'there'], logger.data)
+
+    def test_log_write_message_when_level_is_integer(self):
+        supervisord = DummySupervisor()        
+        interface = self.makeOne(supervisord)
+
+        from supervisor.loggers import LevelsByName
+        result = interface.log('hello', LevelsByName.INFO)
+        self.assertTrue(result)
+
+        logger = supervisord.options.logger
+        self.assertEqual(['hello'], logger.data)
+
+    def test_log_raises_incorrect_parameters_when_level_is_bad(self):
+        supervisord = DummySupervisor()        
+        interface = self.makeOne(supervisord)
+
+        for bad_level in ['bad_level', 9999, None]:
+            self.assertRPCError(SupervisorFaults.INCORRECT_PARAMETERS,
+                                interface.log, 'hello', bad_level)
+
     # Helpers Methods
     
     def getTargetClass(self):

@@ -6,6 +6,7 @@ from supervisor.supervisord import SupervisorStates
 from supervisor.xmlrpc import Faults as SupervisorFaults
 from supervisor.xmlrpc import RPCError
 from supervisor.http import NOT_DONE_YET
+import supervisor.loggers
 
 API_VERSION = '0.1'
 
@@ -47,6 +48,26 @@ class TwiddlerNamespaceRPCInterface:
         """
         self._update('getGroupNames')
         return self.supervisord.process_groups.keys()
+
+    def log(self, message, level=supervisor.loggers.LevelsByName.INFO):
+        """ Write an arbitrary message to the main supervisord log.  This is 
+            useful for recording information about your twiddling.
+        
+        @param  string      message      Message to write to the log
+        @param  string|int  level        Log level name (INFO) or code (20)
+        @return boolean                  Always True unless error
+        """
+        self._update('log')
+
+        if isinstance(level, str):
+            level = getattr(supervisor.loggers.LevelsByName, 
+                            level.upper(), None)
+
+        if supervisor.loggers.LOG_LEVELS_BY_NUM.get(level, None) is None:
+            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS)
+        
+        self.supervisord.options.logger.log(level, message)
+        return True
 
     def addGroup(self, name, priority):
         """ Add a new, empty process group.
