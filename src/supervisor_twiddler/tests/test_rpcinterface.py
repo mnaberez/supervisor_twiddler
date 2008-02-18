@@ -3,7 +3,7 @@ import unittest
 
 import supervisor
 from supervisor.xmlrpc import Faults as SupervisorFaults
-from supervisor.supervisord import SupervisorStates
+from supervisor.states import SupervisorStates, ProcessStates
 
 import supervisor_twiddler
 from supervisor_twiddler.rpcinterface import Faults as TwiddlerFaults
@@ -60,6 +60,13 @@ class TestRPCInterface(unittest.TestCase):
     
     # API Method twiddler.getAPIVersion()
     
+    def test_getAPIVersion_can_be_disabled(self):
+        supervisord = DummySupervisor()
+        interface = self.makeOne(supervisord, whitelist='foo,bar')
+        
+        self.assertRPCError(TwiddlerFaults.NOT_IN_WHITELIST, 
+                            interface.getAPIVersion)
+    
     def test_getAPIVersion_returns_api_version(self):
         supervisord = DummySupervisor()
         interface = self.makeOne(supervisord)
@@ -71,6 +78,13 @@ class TestRPCInterface(unittest.TestCase):
         self.assertEqual(version, API_VERSION)
 
     # API Method twiddler.getGroupNames()
+
+    def test_getGroupNames_can_be_disabled(self):
+        supervisord = DummySupervisor()
+        interface = self.makeOne(supervisord, whitelist='foo,bar')
+        
+        self.assertRPCError(TwiddlerFaults.NOT_IN_WHITELIST, 
+                            interface.getGroupNames)
     
     def test_getGroupNames_returns_empty_array_when_no_groups(self):
         supervisord = DummySupervisor()
@@ -95,9 +109,16 @@ class TestRPCInterface(unittest.TestCase):
         names.index('foo')
         names.index('bar')
     
-    # API Method twiddler.addGroup()
+    # API Method twiddler.addEmptyGroup()
+
+    def test_addEmptyGroup_can_be_disabled(self):
+        supervisord = DummySupervisor()
+        interface = self.makeOne(supervisord, whitelist='foo,bar')
+        
+        self.assertRPCError(TwiddlerFaults.NOT_IN_WHITELIST, 
+                            interface.addEmptyGroup, 'foo', 999)
     
-    def test_addGroup_raises_bad_name_when_group_name_already_exists(self):
+    def test_addEmptyGroup_raises_bad_name_when_group_name_already_exists(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)
@@ -106,21 +127,21 @@ class TestRPCInterface(unittest.TestCase):
         interface = self.makeOne(supervisord)
         
         self.assertRPCError(SupervisorFaults.BAD_NAME,
-                            interface.addGroup,
+                            interface.addEmptyGroup,
                             'existing_group', 42)
 
-    def test_addGroup_raises_incorrect_parameters_when_priority_not_int(self):
+    def test_addEmptyGroup_raises_incorrect_parameters_when_priority_not_int(self):
         supervisord = DummySupervisor()
         interface = self.makeOne(supervisord)
         
         self.assertRPCError(SupervisorFaults.INCORRECT_PARAMETERS,
-                            interface.addGroup,
+                            interface.addEmptyGroup,
                             'new_group', 'not_an_int')
 
-    def test_addGroup_adds_and_configures_new_group(self):
+    def test_addEmptyGroup_adds_and_configures_new_group(self):
         supervisord = DummySupervisor()
         interface = self.makeOne(supervisord)
-        self.assertTrue(interface.addGroup('new_group', 42))
+        self.assertTrue(interface.addEmptyGroup('new_group', 42))
         
         new_group = supervisord.process_groups.get('new_group')
         self.assertType(supervisor.process.ProcessGroup, new_group)
@@ -131,6 +152,13 @@ class TestRPCInterface(unittest.TestCase):
         self.assertEquals([], config.process_configs)
     
     # API Method twiddler.addProgramToGroup()
+
+    def test_addProgramToGroup_can_be_disabled(self):
+        supervisord = DummySupervisor()
+        interface = self.makeOne(supervisord, whitelist='foo,bar')
+        
+        self.assertRPCError(TwiddlerFaults.NOT_IN_WHITELIST, 
+                            interface.addProgramToGroup, 'grp', 'prog', {})
     
     def test_addProgramToGroup_raises_bad_name_when_group_doesnt_exist(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
@@ -266,6 +294,13 @@ class TestRPCInterface(unittest.TestCase):
 
     # API Method twiddler.removeProcessFromGroup()
 
+    def test_removeProcessFromGroup_can_be_disabled(self):
+        supervisord = DummySupervisor()
+        interface = self.makeOne(supervisord, whitelist='foo,bar')
+        
+        self.assertRPCError(TwiddlerFaults.NOT_IN_WHITELIST, 
+                            interface.removeProcessFromGroup, 'group', 'process')
+
     def test_removeProcessFromGroup_raises_bad_name_when_group_doesnt_exist(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
@@ -309,8 +344,8 @@ class TestRPCInterface(unittest.TestCase):
     
     def test_removeProcessFromGroup_transitions_process_group(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
-        process = DummyProcess(pconfig)
-
+        process = DummyProcess(pconfig, ProcessStates.EXITED)
+        
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)   
         pgroup.processes = { 'process_name': process }
@@ -324,7 +359,7 @@ class TestRPCInterface(unittest.TestCase):
     
     def test_removeProcessFromGroup_deletes_the_process(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
-        process = DummyProcess(pconfig)
+        process = DummyProcess(pconfig, ProcessStates.STOPPED)
 
         gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
         pgroup = DummyProcessGroup(gconfig)   
@@ -339,6 +374,13 @@ class TestRPCInterface(unittest.TestCase):
         self.assertEqual('removeProcessFromGroup', interface.update_text)
 
     # API Method twiddler.log()
+
+    def test_log_can_be_disabled(self):
+        supervisord = DummySupervisor()
+        interface = self.makeOne(supervisord, whitelist='foo,bar')
+        
+        self.assertRPCError(TwiddlerFaults.NOT_IN_WHITELIST, 
+                            interface.log, 'message')
     
     def test_log_write_message_when_level_is_string(self):
         supervisord = DummySupervisor()        

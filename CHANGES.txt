@@ -1,3 +1,20 @@
+Next Release
+
+  Added a whitelist option.  When used, only RPC methods in 
+  the whitelist will be accessible.  If the whitelist is
+  not used or empty, all methods will be accessible.
+  
+    [rpcinterface:twiddler]
+    supervisor.rpcinterface_factory = supervisor_twiddler.rpcinterface:make_twiddler_rpcinterface  
+    whitelist = getAPIVersion,getGroupNames
+
+  When the whitelist is used, all methods will still appear in 
+  system.listMethods() but calling a method not in the whitelist
+  will return fault 230 NOT_IN_WHITELIST.
+
+  Renamed method addGroup(), which was used to add a new empty
+  program group, to addEmptyGroup().
+
 0.2 (16-Feb-2008)
 
   Renamed addProcessToGroup() to addProgramToGroup().  The method

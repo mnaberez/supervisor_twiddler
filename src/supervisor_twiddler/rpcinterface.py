@@ -2,35 +2,40 @@ import os
 
 from supervisor.options import UnhosedConfigParser
 from supervisor.options import ProcessGroupConfig
-from supervisor.supervisord import SupervisorStates
+from supervisor.datatypes import list_of_strings
+from supervisor.states import SupervisorStates
+from supervisor.states import ProcessStates, STOPPED_STATES
 from supervisor.xmlrpc import Faults as SupervisorFaults
 from supervisor.xmlrpc import RPCError
 from supervisor.http import NOT_DONE_YET
 import supervisor.loggers
 
-API_VERSION = '0.1'
+API_VERSION = '0.2'
 
 class Faults:
-    STILL_RUNNING = 220
+    STILL_RUNNING   = 220
+    NOT_IN_WHITELIST = 230
 
 class TwiddlerNamespaceRPCInterface:
     """ A supervisor rpc interface that facilitates manipulation of 
     supervisor's configuration and state in ways that are not 
     normally accessible at runtime.
     """
-    def __init__(self, supervisord):
+    def __init__(self, supervisord, whitelist=[]):
         self.supervisord = supervisord
+        self._whitelist = list_of_strings(whitelist)
 
-    def _update(self, text):
-        self.update_text = text # for unit tests, mainly
+    def _update(self, func_name):
+        self.update_text = func_name 
 
         state = self.supervisord.get_state()
-
         if state == SupervisorStates.SHUTDOWN:
             raise RPCError(SupervisorFaults.SHUTDOWN_STATE)
 
-        # XXX fatal state
-        
+        if len(self._whitelist):
+            if func_name not in self._whitelist:
+                raise RPCError(Faults.NOT_IN_WHITELIST, func_name)
+
     # RPC API methods
 
     def getAPIVersion(self):
@@ -69,14 +74,14 @@ class TwiddlerNamespaceRPCInterface:
         self.supervisord.options.logger.log(level, message)
         return True
 
-    def addGroup(self, name, priority):
+    def addEmptyGroup(self, name, priority):
         """ Add a new, empty process group.
         
         @param string   name         Name for the new process group
         @param integer  priority     Group priority (same as supervisord.conf)
         @return boolean              Always True unless error
         """
-        self._update('addGroup')
+        self._update('addEmptyGroup')
         
         # check group_name does not already exist
         if self.supervisord.process_groups.get(name) is not None:
@@ -159,19 +164,17 @@ class TwiddlerNamespaceRPCInterface:
         process = group.processes.get(process_name)
         if process is None:
             raise RPCError(SupervisorFaults.BAD_NAME, process_name)
-        if process.pid:
+        if process.pid or process.state not in STOPPED_STATES:
             raise RPCError(Faults.STILL_RUNNING, process_name)
 
         group.transition()
 
-        # del process config from group
+        # del process config from group, then del process
         for index, config in enumerate(group.config.process_configs):
             if config.name == process_name:
                 del group.config.process_configs[index]
-        
-        # del process
+                
         del group.processes[process_name]
-
         return True
 
     def _getProcessGroup(self, name):
@@ -195,4 +198,4 @@ class TwiddlerNamespaceRPCInterface:
         return config
 
 def make_twiddler_rpcinterface(supervisord, **config):
-    return TwiddlerNamespaceRPCInterface(supervisord)
+    return TwiddlerNamespaceRPCInterface(supervisord, **config)
