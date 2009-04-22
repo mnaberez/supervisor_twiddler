@@ -1,4 +1,4 @@
-# supervisor_cache
+# supervisor_twiddler
 
 This package is an RPC extension for [Supervisor](http://supervisord.org) 
 that allows Supervisor's configuration and state to be manipulated in ways 
@@ -73,6 +73,114 @@ not think its quick termination was an error.
 
 The process was then started and its output read using the normal API commands
 provided by Supervisor.
+
+## API Description
+
+### Testing the API Version
+
+All RPC extensions for Supervisor follow a convention where a method called
+`getAPIVersion()` is available. supervisor_twiddler provides this:
+
+    twiddler.getAPIVersion()
+
+It is highly recommended that when you develop software that uses
+supervisor_twiddler, you test the API version before making method calls.
+
+### Listing Process Groups
+
+Process groups are defined in supervisord.conf as group sections. Assume
+`supervisord.conf` contained sections `[group:foo]` and `[group:bar]`:
+
+    twiddler.getGroupNames()
+
+The return value would then return an array: `["foo", "bar"]`. It is possible
+to use supervisor_twiddler to add new process groups at runtime, and these
+will also be included in the results returned by `twiddler.getGroupNames()`.
+
+### Adding Process Groups
+
+It is possible to add empty process groups by specifying empty `[group:foo]`
+sections in supervisord.conf with no `programs=` entries under them. However, it
+is not possible to add new empty process groups after supervisord has been
+started.
+
+The `twiddler.addGroup()` method adds an empty process group. It takes two
+parameters: the name of the new group as a string, and its priority as an
+integer:
+
+    twiddler.addGroup("foos", 999)
+
+The first parameter (`foos`) is the name of the new process group. The second
+parameter (`999`) is the group's priority, like in supervisord.conf.
+
+The method call above will create a new, empty process group named `foos`. You
+can then populate this group with processes using `twidder.addProgramToGroup()`.
+
+It is not yet possible to remove a process group, but this is planned for a
+future release of `supervisor_twiddler`.
+
+### Adding a New Program to a Group
+
+In supervisord.conf, a `[program:x]` section will result one or more processes,
+depending on `numprocs` and named by `process_name`.
+
+The `twiddler.addProgramToGroup()` method makes it possible to add a new program
+to a group (resulting in one or more processes) and then control these
+processes as if they had existed originally in `supervisord.conf`.
+
+    twiddler.addProgramToGroup("group_name", "foo", 
+      {"command": "/usr/bin/foo"})
+
+The first parameter (`group_name`) is the group name where the new process will
+belong. While there is no restriction on what groups can be used, it is
+recommended that you keep your `supervisord.conf` groups static. You can add new
+process groups just for your dynamic processes, and this will help you track
+them easier.
+
+The second parameter (`foo`) is the name of the new program to add to the group,
+as it would have been written in the `[program:foo]` section `supervisord.conf`.
+
+The final parameter is a dict (XML-RPC "struct") containing the program
+options. These are the same options as in the `supervisor.conf` program section
+and follow the same rules. The only required key is `command`.
+
+When you add a program in this way and do not specify the autostart option,
+the process will start on the next transition of Supervisor's state machine
+(almost immediately). You might want to set autostart to `false` and then
+start the process with `supervisor.startProcess()`.
+
+Similarly, you might want to set autorestart to `false` if you don't want
+Supervisor to restart it immediately after it exits.
+
+If the process you are adding exits quickly, make sure that you set `startsecs`
+to `0`. Otherwise, Supervisor will think the process failed to start and will
+give an abnormal termination error.
+
+### Removing a Process from a Group
+
+When processes are no longer needed in the supervisord runtime configuration,
+the `twiddler.removeProcessFromGroup()` method can be used:
+
+    twiddler.removeProcessFromGroup("group_name", "process_name")
+
+To be removed, the process must not be running. It must have terminated on its
+own or have been stopped with `supervisor.stopProcess()`.
+
+### Logging a Message
+
+The `twiddler.log()` method allows you to write arbitrary messages to
+Supervisor's main log. When you twiddle with Supervisor's configuration, this
+method is useful for logging messages about what was done.
+
+    twiddler.log("This is an informational message", "INFO")
+
+The first argument is a string message to write to the log. The second
+argument is the log level and is optional (defaults to `INFO`). The log level
+may be a string or an integer.
+                                                             
+Log levels are defined in the supervisor.loggers module and at the time of
+writing are: `CRIT` (50), `ERRO` (40), `WARN` (30), `INFO` (20), `DEBG` (10), 
+`TRAC` (5), and `BLAT` (3).
 
 ## Warnings
 
