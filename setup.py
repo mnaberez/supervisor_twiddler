@@ -1,4 +1,4 @@
-__revision__ = '$Id: setup.py,v 1.3 2007/10/04 18:17:31 chrism Exp $'
+__version__ = '0.3'
 
 from ez_setup import use_setuptools
 use_setuptools()
@@ -34,12 +34,9 @@ CLASSIFIERS = [
     'Topic :: System :: Systems Administration',
     ]
 
-version_txt = os.path.join(here, 'src/supervisor_twiddler/version.txt')
-supervisor_twiddler_version = open(version_txt).read().strip()
-
 dist = setup(
     name = 'supervisor_twiddler',
-    version = supervisor_twiddler_version,
+    version = __version__,
     license = 'License :: OSI Approved :: BSD License',
     url = 'http://maintainable.com/software/supervisor_twiddler',
     description = "supervisor_twiddler RPC extension for supervisor2",
@@ -56,4 +53,4 @@ dist = setup(
     zip_safe = False,
     namespace_packages = ['supervisor_twiddler'],
     test_suite = 'supervisor_twiddler.tests'
-    )
+)
