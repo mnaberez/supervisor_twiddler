@@ -5,18 +5,16 @@ use_setuptools()
 
 import os
 import sys
-import string
 
-version, extra = string.split(sys.version, ' ', 1)
-maj, minor = string.split(version, '.', 1)
-
-if not maj[0] >= '2' and minor[0] >= '3':
-    msg = ("supervisor requires Python 2.3 or better, you are attempting to "
-           "install it using version %s.  Please install with a "
-           "supported version" % version)
+if sys.version_info[:2] < (2, 3):
+    msg = ("Py65 requires Python 2.4 or better, you are attempting to "
+           "install it using version %s. Please install with a "
+           "supported version" % sys.version)
+    sys.stderr.write(msg)
+    sys.exit(1)
 
 from setuptools import setup, find_packages
-here = os.path.abspath(os.path.normpath(os.path.dirname(__file__)))
+here = os.path.abspath(os.path.dirname(__file__))
 
 DESC = """\
 supervisor_twiddler is an RPC extension for the supervisor2 package that
@@ -34,7 +32,7 @@ CLASSIFIERS = [
     'Topic :: System :: Systems Administration',
     ]
 
-dist = setup(
+setup(
     name = 'supervisor_twiddler',
     version = __version__,
     license = 'License :: OSI Approved :: BSD License',
