@@ -1,0 +1,3 @@
+include CHANGES.txt
+include README.markdown
+include LICENSE.txt
