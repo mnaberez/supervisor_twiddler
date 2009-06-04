@@ -17,9 +17,9 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
 DESC = """\
-supervisor_twiddler is an RPC extension for the supervisor2 package that
-facilitates manipulation of supervisor's configuration and state in ways 
-that are not normally accessible at runtime."""
+supervisor_twiddler is an RPC extension for Supervisor that allows
+Supervisor's configuration and state to be manipulated in ways that are not
+normally possible at runtime."""
 
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
@@ -36,8 +36,8 @@ setup(
     name = 'supervisor_twiddler',
     version = __version__,
     license = 'License :: OSI Approved :: BSD License',
-    url = 'http://maintainable.com/software/supervisor_twiddler',
-    description = "supervisor_twiddler RPC extension for supervisor2",
+    url = 'http://github.com/mnaberez/supervisor_twiddler',
+    description = "supervisor_twiddler RPC extension for Supervisor",
     long_description= DESC,
     classifiers = CLASSIFIERS,
     author = "Mike Naberezny",
@@ -46,7 +46,14 @@ setup(
     maintainer_email = "mike@maintainable.com",
     package_dir = {'':'src'},
     packages = find_packages(os.path.join(here, 'src')),
-    install_requires = ['supervisor>=3.0a3'],
+    # put data files in egg 'doc' dir
+    data_files=[ ('doc', [
+        'CHANGES.txt',
+        'LICENSE.txt',
+        'README.markdown',
+        ]
+    )],
+    install_requires = ['supervisor >= 3.0a3'],
     include_package_data = True,
     zip_safe = False,
     namespace_packages = ['supervisor_twiddler'],
