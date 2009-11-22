@@ -1,4 +1,6 @@
 Next Release
+ 
+  We no longer bundle ez_setup to boostrap setuptools installation.
 
   Added a whitelist option.  When used, only RPC methods in 
   the whitelist will be accessible.  If the whitelist is
