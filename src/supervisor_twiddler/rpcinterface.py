@@ -13,7 +13,6 @@ import supervisor.loggers
 API_VERSION = '0.2'
 
 class Faults:
-    STILL_RUNNING   = 220
     NOT_IN_WHITELIST = 230
 
 class TwiddlerNamespaceRPCInterface:
@@ -92,14 +91,14 @@ class TwiddlerNamespaceRPCInterface:
         section_name = '%s:%s' % (group_type, name)
         group_options.pop('programs', None)
         parser = self._makeConfigParser(section_name, group_options)
-
+        
         # make a new group with no process configs
         options = self.supervisord.options
         try:
             new_groups = options.process_groups_from_parser(parser)
         except ValueError, why:
             raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why)
-        
+
         # add new process group
         group = new_groups[0]
         self.supervisord.process_groups[name] = group
@@ -168,7 +167,7 @@ class TwiddlerNamespaceRPCInterface:
         if process is None:
             raise RPCError(SupervisorFaults.BAD_NAME, process_name)
         if process.pid or process.state not in STOPPED_STATES:
-            raise RPCError(Faults.STILL_RUNNING, process_name)
+            raise RPCError(SupervisorFaults.STILL_RUNNING, process_name)
 
         group.transition()
 

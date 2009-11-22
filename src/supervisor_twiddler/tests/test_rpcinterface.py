@@ -338,7 +338,7 @@ class TestRPCInterface(unittest.TestCase):
         supervisord = DummySupervisor(process_groups = {'group_name': pgroup})
         interface = self.makeOne(supervisord)
         
-        self.assertRPCError(TwiddlerFaults.STILL_RUNNING,
+        self.assertRPCError(SupervisorFaults.STILL_RUNNING,
                             interface.removeProcessFromGroup,
                             'group_name', 'process_with_pid')
     
