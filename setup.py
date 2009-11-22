@@ -53,7 +53,7 @@ setup(
         'README.markdown',
         ]
     )],
-    install_requires = ['supervisor >= 3.0a3'],
+    install_requires = ['supervisor >= 3.0a6'],
     include_package_data = True,
     zip_safe = False,
     namespace_packages = ['supervisor_twiddler'],
