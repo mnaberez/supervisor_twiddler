@@ -1,4 +1,4 @@
-Next Release
+0.3-dev *Next Release*
  
   We no longer bundle ez_setup to boostrap setuptools installation.
 
