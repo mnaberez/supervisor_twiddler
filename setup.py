@@ -38,9 +38,9 @@ setup(
     long_description= DESC,
     classifiers = CLASSIFIERS,
     author = "Mike Naberezny",
-    author_email = "mike@maintainable.com",
+    author_email = "mike@naberezny.com",
     maintainer = "Mike Naberezny",
-    maintainer_email = "mike@maintainable.com",
+    maintainer_email = "mike@naberezny.com",
     package_dir = {'':'src'},
     packages = find_packages(os.path.join(here, 'src')),
     # put data files in egg 'doc' dir
