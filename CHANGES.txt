@@ -1,5 +1,7 @@
 0.3-dev *Next Release*
- 
+
+  Supervisor 3.0a10 or later is now required.
+
   We no longer bundle ez_setup to boostrap setuptools installation.
 
   Added a whitelist option.  When used, only RPC methods in 
