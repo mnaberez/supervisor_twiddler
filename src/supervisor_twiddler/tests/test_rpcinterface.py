@@ -21,7 +21,7 @@ class TestRPCInterface(unittest.TestCase):
         twiddler_faults = self.attrDictWithoutUnders(TwiddlerFaults)
 
         for name in supervisor_faults.keys():
-            self.assertNone(twiddler_faults.get(name))
+            self.assertTrue(twiddler_faults.get(name) is None)
 
     def test_twiddler_fault_codes_dont_clash_with_supervisord_fault_codes(self):
         supervisor_fault_codes = self.attrDictWithoutUnders(SupervisorFaults).values()
@@ -46,7 +46,8 @@ class TestRPCInterface(unittest.TestCase):
         supervisord = DummySupervisor()
         interface = rpcinterface.make_twiddler_rpcinterface(supervisord)
         
-        self.assertType(rpcinterface.TwiddlerNamespaceRPCInterface, interface)
+        self.assertTrue(isinstance(interface, 
+            rpcinterface.TwiddlerNamespaceRPCInterface))
         self.assertEquals(supervisord, interface.supervisord)
 
     # Updater
@@ -91,7 +92,7 @@ class TestRPCInterface(unittest.TestCase):
         interface = self.makeOne(supervisord)
         
         names = interface.getGroupNames()
-        self.assertType(list, names)
+        self.assertTrue(isinstance(names, list))
         self.assertEquals(0, len(names))
     
     def test_getGroupNames_returns_group_names(self):
@@ -104,7 +105,7 @@ class TestRPCInterface(unittest.TestCase):
         interface = self.makeOne(supervisord)
                 
         names = interface.getGroupNames()
-        self.assertType(list, names)
+        self.assertTrue(isinstance(names, list))
         self.assertEquals(2, len(names))
         names.index('foo')
         names.index('bar')
@@ -144,7 +145,8 @@ class TestRPCInterface(unittest.TestCase):
         self.assertTrue(interface.addEmptyGroup('new_group', 42))
         
         new_group = supervisord.process_groups.get('new_group')
-        self.assertType(supervisor.process.ProcessGroup, new_group)
+        self.assertTtrue(isinstance(new_group, 
+            supervisor.process.ProcessGroup))
 
         config = new_group.config
         self.assertEquals('new_group', config.name)
@@ -232,7 +234,7 @@ class TestRPCInterface(unittest.TestCase):
     
         process = pgroup.processes['new_process']
 
-        self.assertType(supervisor.process.Subprocess, process)
+        self.assertTrue(isinstance(process, supervisor.process.Subprocess))
         self.assertEqual('/usr/bin/find /', process.config.command)
 
     def test_addProgramToGroup_adds_new_process_config_to_group(self):
@@ -252,7 +254,7 @@ class TestRPCInterface(unittest.TestCase):
     
         config = pgroup.config.process_configs[1]
         self.assertEqual('new_process', config.name)
-        self.assertType(supervisor.options.ProcessConfig, config)
+        self.assertTrue(isinstance(config, supervisor.options.ProcessConfig))
     
     def test_addProgramToGroup_uses_process_name_from_options(self):
         gconfig = DummyPGroupConfig(None, pconfigs=[])
@@ -270,8 +272,9 @@ class TestRPCInterface(unittest.TestCase):
     
         config = pgroup.config.process_configs[0]
         self.assertEqual('renamed', config.name)
-        self.assertNone(pgroup.processes.get('new_process'))
-        self.assertType(supervisor.process.Subprocess, pgroup.processes.get('renamed'))
+        self.assertTrue(pgroup.processes.get('new_process') is None)
+        self.assertTrue(isinstance(pgroup.processes.get('renamed'),
+          supervisor.process.Subprocess))
 
     def test_addProgramToGroup_adds_all_processes_resulting_from_program_options(self):
         gconfig = DummyPGroupConfig(None, pconfigs=[])
@@ -370,7 +373,7 @@ class TestRPCInterface(unittest.TestCase):
         
         result = interface.removeProcessFromGroup('group_name', 'process_name')
         self.assertTrue(result)
-        self.assertNone(pgroup.processes.get('process_name'))
+        self.assertTrue(pgroup.processes.get('process_name') is None)
         self.assertEqual('removeProcessFromGroup', interface.update_text)
 
     # API Method twiddler.log()
@@ -439,18 +442,6 @@ class TestRPCInterface(unittest.TestCase):
             self.assertEqual(inst.code, code)
         else:
             self.fail('RPCError was never raised')
-
-    def assertTrue(self, obj):
-        self.assert_(obj is True)
-
-    def assertFalse(self, obj):
-        self.assert_(obj is False)
-    
-    def assertNone(self, obj):
-        self.assert_(obj is None)
-
-    def assertType(self, typeof, obj):
-        self.assertEqual(True, isinstance(obj, typeof), 'type mismatch')
 
 
 def test_suite():
