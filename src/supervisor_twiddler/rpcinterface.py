@@ -10,7 +10,7 @@ from supervisor.xmlrpc import RPCError
 from supervisor.http import NOT_DONE_YET
 import supervisor.loggers
 
-API_VERSION = '0.2'
+API_VERSION = '0.3'
 
 class Faults:
     NOT_IN_WHITELIST = 230
