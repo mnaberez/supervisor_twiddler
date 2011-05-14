@@ -73,37 +73,6 @@ class TwiddlerNamespaceRPCInterface:
         self.supervisord.options.logger.log(level, message)
         return True
 
-    def addEmptyGroup(self, name, group_type, group_options={}):
-        """ Add a new, empty process group.
-        
-        @param string  name           Name for the new process group
-        @param string  group_type     Type: "program", "eventlistener", etc.
-        @param struct  group_options  Group options (same as supervisord.conf)
-        @return boolean               Always True unless error
-        """
-        self._update('addEmptyGroup')
-        
-        # check group_name does not already exist
-        if self.supervisord.process_groups.get(name) is not None:
-            raise RPCError(SupervisorFaults.BAD_NAME, name)
-
-        # make configparser instance for group options
-        section_name = '%s:%s' % (group_type, name)
-        group_options.pop('programs', None)
-        parser = self._makeConfigParser(section_name, group_options)
-        
-        # make a new group with no process configs
-        options = self.supervisord.options
-        try:
-            new_groups = options.process_groups_from_parser(parser)
-        except ValueError, why:
-            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why)
-
-        # add new process group
-        group = new_groups[0]
-        self.supervisord.process_groups[name] = group
-        return True
-
     def addProgramToGroup(self, group_name, program_name, program_options):
         """ Add a new program to an existing process group.  Depending on the
             numprocs option, this will result in one or more processes being

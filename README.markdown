@@ -97,28 +97,6 @@ The return value would then return an array: `["foo", "bar"]`. It is possible
 to use supervisor_twiddler to add new process groups at runtime, and these
 will also be included in the results returned by `twiddler.getGroupNames()`.
 
-### Adding Process Groups
-
-It is possible to add empty process groups by specifying empty `[group:foo]`
-sections in supervisord.conf with no `programs=` entries under them. However, it
-is not possible to add new empty process groups after supervisord has been
-started.
-
-The `twiddler.addGroup()` method adds an empty process group. It takes two
-parameters: the name of the new group as a string, and its priority as an
-integer:
-
-    twiddler.addGroup("foos", 999)
-
-The first parameter (`foos`) is the name of the new process group. The second
-parameter (`999`) is the group's priority, like in supervisord.conf.
-
-The method call above will create a new, empty process group named `foos`. You
-can then populate this group with processes using `twidder.addProgramToGroup()`.
-
-It is not yet possible to remove a process group, but this is planned for a
-future release of `supervisor_twiddler`.
-
 ### Adding a New Program to a Group
 
 In supervisord.conf, a `[program:x]` section will result one or more processes,

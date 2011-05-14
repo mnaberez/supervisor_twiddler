@@ -110,49 +110,6 @@ class TestRPCInterface(unittest.TestCase):
         names.index('foo')
         names.index('bar')
     
-    # API Method twiddler.addEmptyGroup()
-
-    def test_addEmptyGroup_can_be_disabled(self):
-        supervisord = DummySupervisor()
-        interface = self.makeOne(supervisord, whitelist='foo,bar')
-        
-        self.assertRPCError(TwiddlerFaults.NOT_IN_WHITELIST, 
-                            interface.addEmptyGroup, 'foo', 999)
-    
-    def test_addEmptyGroup_raises_bad_name_when_group_name_already_exists(self):
-        pconfig = DummyPConfig(None, 'foo', '/bin/foo')
-        gconfig = DummyPGroupConfig(None, pconfigs=[pconfig])
-        pgroup = DummyProcessGroup(gconfig)
-
-        supervisord = DummySupervisor(process_groups = {'existing_group': pgroup})
-        interface = self.makeOne(supervisord)
-        
-        self.assertRPCError(SupervisorFaults.BAD_NAME,
-                            interface.addEmptyGroup,
-                            'existing_group', 42)
-
-    def test_addEmptyGroup_raises_incorrect_parameters_when_priority_not_int(self):
-        supervisord = DummySupervisor()
-        interface = self.makeOne(supervisord)
-        
-        self.assertRPCError(SupervisorFaults.INCORRECT_PARAMETERS,
-                            interface.addEmptyGroup,
-                            'new_group', 'not_an_int')
-
-    def test_addEmptyGroup_adds_and_configures_new_group(self):
-        supervisord = DummySupervisor()
-        interface = self.makeOne(supervisord)
-        self.assertTrue(interface.addEmptyGroup('new_group', 42))
-        
-        new_group = supervisord.process_groups.get('new_group')
-        self.assertTtrue(isinstance(new_group, 
-            supervisor.process.ProcessGroup))
-
-        config = new_group.config
-        self.assertEquals('new_group', config.name)
-        self.assertEquals(42, config.priority)
-        self.assertEquals([], config.process_configs)
-    
     # API Method twiddler.addProgramToGroup()
 
     def test_addProgramToGroup_can_be_disabled(self):

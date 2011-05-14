@@ -16,9 +16,6 @@
   system.listMethods() but calling a method not in the whitelist
   will return fault 230 NOT_IN_WHITELIST.
 
-  Renamed method addGroup(), which was used to add a new empty
-  program group, to addEmptyGroup().
-
 0.2 (16-Feb-2008)
 
   Renamed addProcessToGroup() to addProgramToGroup().  The method
