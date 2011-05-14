@@ -1,5 +1,14 @@
 0.4 *Next Release*
 
+  Added a new eventlistener result handler that receives an "STDIN:"
+  command in the result and sends any following bytes to the 
+  STDIN of the process associated with the event.  In supervisord.conf:
+
+  [eventlistener:process_comm_listener]
+  events=PROCESS_COMMUNICATION_STDOUT    
+  result_handler=supervisor_twiddler.resulthandler:stdin_write_handler
+  ...
+
 0.3 (14-May-2010)
 
   Supervisor 3.0a10 or later is now required.
