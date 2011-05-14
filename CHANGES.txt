@@ -1,4 +1,4 @@
-0.3-dev *Next Release*
+0.3 (14-May-2010)
 
   Supervisor 3.0a10 or later is now required.
 
