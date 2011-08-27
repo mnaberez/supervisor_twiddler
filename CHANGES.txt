@@ -1,4 +1,4 @@
-0.4 *Next Release*
+0.4 (27-Aug-2011)
 
   Added a new eventlistener result handler that receives an "STDIN:"
   command in the result and sends any following bytes to the 
