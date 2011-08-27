@@ -1,3 +1,5 @@
+0.5 *Next release*
+
 0.4 (27-Aug-2011)
 
   Added a new eventlistener result handler that receives an "STDIN:"
