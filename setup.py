@@ -3,10 +3,10 @@ __version__ = '0.5-dev'
 import os
 import sys
 
-if sys.version_info[:2] < (2, 3):
-    msg = ("Py65 requires Python 2.4 or better, you are attempting to "
-           "install it using version %s. Please install with a "
-           "supported version" % sys.version)
+if sys.version_info[:2] < (2, 4) or sys.version_info[0] > 2:
+    msg = ("supervisor_twiddler requires Python 2.4 or later but does not "
+           "work on any version of Python 3.  You are using version %s.  "
+           "Please install using a supported version." % sys.version)
     sys.stderr.write(msg)
     sys.exit(1)
 
