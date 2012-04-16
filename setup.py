@@ -47,7 +47,7 @@ setup(
     data_files=[ ('doc', [
         'CHANGES.txt',
         'LICENSE.txt',
-        'README.markdown',
+        'README.md',
         ]
     )],
     install_requires = ['supervisor >= 3.0a10'],
