@@ -1,7 +1,7 @@
 # supervisor_twiddler
 
-This package is an RPC extension for [Supervisor](http://supervisord.org) 
-that allows Supervisor's configuration and state to be manipulated in ways 
+This package is an RPC extension for [Supervisor](http://supervisord.org)
+that allows Supervisor's configuration and state to be manipulated in ways
 that are not normally possible at runtime.
 
 ## Installation
@@ -10,8 +10,8 @@ that are not normally possible at runtime.
 extract, then install to Python's `site-packages`:
 
     $ python setup.py install
-    
-After installing the package, you must modify your `supervisord.conf` file 
+
+After installing the package, you must modify your `supervisord.conf` file
 to register the twiddler interface:
 
     [rpcinterface:twiddler]
@@ -45,7 +45,7 @@ URL to appease ServerProxy, but it is superfluous.
 
     >>> import xmlrpclib
     >>> from supervisor.xmlrpc import SupervisorTransport
-    >>> s = xmlrpclib.ServerProxy('http://127.0.0.1/whatever', 
+    >>> s = xmlrpclib.ServerProxy('http://127.0.0.1/whatever',
     ... SupervisorTransport('', '', 'unix:///path/to/supervisor.sock'))
 
 Once `ServerProxy` has been configured appropriately, we can now exercise
@@ -53,19 +53,18 @@ supervisor_twiddler:
 
     >>> s.twiddler.getAPIVersion()
     '0.1'
-    >>> s.twiddler.addGroup('dynamic_procs', 999)
-    True
-    >>> s.twiddler.addProgramToGroup('dynamic_procs', 'ls', {'command':'ls -l', 
+    >>> s.twiddler.addProgramToGroup('group_name', 'ls', {'command':'ls -l',
     ... 'autostart':'false', 'autorestart':'false', 'startsecs':'0'})
     True
-    >>> s.supervisor.startProcess('dynamic_procs:ls')
+    >>> s.supervisor.startProcess('group_name:ls')
     True
-    >>> s.supervisor.readProcessLog('dynamic_procs:ls', 0, 50)
+    >>> s.supervisor.readProcessLog('group_name:ls', 0, 50)
     'total 0
     drwxr-xr-x   9 mnaberez  mnaberez  306 Nov'
 
-In the session above, a new process group called `dynamic_procs` was created and
-a process called `ls` was added to it.
+In the session above, a new program called `ls` was added to the existing
+group called `group_name`.  You can create empty groups in `supervisord.conf`
+by adding an empty `[group:x]` section.
 
 The process was configured to not start automatically (`autostart`), not restart
 automatically (`autorestart`), and `startsecs` was set to zero so Supervisor would
@@ -106,7 +105,7 @@ The `twiddler.addProgramToGroup()` method makes it possible to add a new program
 to a group (resulting in one or more processes) and then control these
 processes as if they had existed originally in `supervisord.conf`.
 
-    twiddler.addProgramToGroup("group_name", "foo", 
+    twiddler.addProgramToGroup("group_name", "foo",
       {"command": "/usr/bin/foo"})
 
 The first parameter (`group_name`) is the group name where the new process will
@@ -155,9 +154,9 @@ method is useful for logging messages about what was done.
 The first argument is a string message to write to the log. The second
 argument is the log level and is optional (defaults to `INFO`). The log level
 may be a string or an integer.
-                                                             
+
 Log levels are defined in the supervisor.loggers module and at the time of
-writing are: `CRIT` (50), `ERRO` (40), `WARN` (30), `INFO` (20), `DEBG` (10), 
+writing are: `CRIT` (50), `ERRO` (40), `WARN` (30), `INFO` (20), `DEBG` (10),
 `TRAC` (5), and `BLAT` (3).
 
 ## Warnings
