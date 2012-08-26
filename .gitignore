@@ -5,4 +5,4 @@
 *.swp
 build/
 dist/
-src/supervisor_twiddler.egg-info/
+supervisor_twiddler.egg-info/

@@ -41,8 +41,7 @@ setup(
     author_email = "mike@naberezny.com",
     maintainer = "Mike Naberezny",
     maintainer_email = "mike@naberezny.com",
-    package_dir = {'':'src'},
-    packages = find_packages(os.path.join(here, 'src')),
+    packages = find_packages(),
     # put data files in egg 'doc' dir
     data_files=[ ('doc', [
         'CHANGES.txt',
