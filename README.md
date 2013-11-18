@@ -11,14 +11,13 @@ extract, then install to Python's `site-packages`:
 
     $ python setup.py install
 
-After installing the package, you must modify your `supervisord.conf` file
+After installing the package, add these lines to your ``supervisord.conf`` file
 to register the twiddler interface:
 
     [rpcinterface:twiddler]
     supervisor.rpcinterface_factory = supervisor_twiddler.rpcinterface:make_twiddler_rpcinterface
 
-After modifying the `supervisord.conf` file, your Supervisor instance must be
-restarted for the twiddler interface to be loaded.
+You must restart Supervisor for the twiddler interface to be loaded.
 
 ## Usage
 
