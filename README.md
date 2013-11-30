@@ -95,8 +95,8 @@ will also be included in the results returned by `twiddler.getGroupNames()`.
 
 ### Adding a New Program to a Group
 
-In supervisord.conf, a `[program:x]` section will result one or more processes,
-depending on `numprocs` and named by `process_name`.
+In supervisord.conf, a `[program:x]` section will result in one or more
+processes, depending on `numprocs` and named by `process_name`.
 
 The `twiddler.addProgramToGroup()` method makes it possible to add a new program
 to a group (resulting in one or more processes) and then control these
