@@ -21,10 +21,6 @@ You must restart Supervisor for the twiddler interface to be loaded.
 
 ## Usage
 
-Normally, supervisord's configuration (specified in `supervisord.conf`) cannot
-be changed after supervisord has been started. For changes in `supervisord.conf`
-to take effect, supervisord must be restarted.
-
 There are times when it is useful to be able to dynamically add and remove
 process configurations on a supervisord instance. This is the functionality
 that supervisor_twiddler provides. After restarting supervisord, the changes
