@@ -7,7 +7,7 @@ that are not normally possible at runtime.
 ## Installation
 
 supervisor_twiddler packages are
-`available on PyPI<http://pypi.python.org/pypi/supervisor_twiddler>`_.
+[available on PyPI](http://pypi.python.org/pypi/supervisor_twiddler).
 You download them from there or you can use ``pip`` to
 automatically install or upgrade:
 
