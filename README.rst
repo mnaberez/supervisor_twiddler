@@ -1,27 +1,34 @@
-# supervisor_twiddler
+supervisor_twiddler
+===================
 
-This package is an RPC extension for [Supervisor](http://supervisord.org)
+This package is an RPC extension for `Supervisor <http://supervisord.org>`_
 that allows Supervisor's configuration and state to be manipulated in ways
 that are not normally possible at runtime.
 
-## Installation
+Installation
+------------
 
 supervisor_twiddler packages are
-[available on PyPI](http://pypi.python.org/pypi/supervisor_twiddler).
+`available on PyPI <http://pypi.python.org/pypi/supervisor_twiddler>`_.
 You download them from there or you can use ``pip`` to
 automatically install or upgrade:
+
+.. code-block:: bash
 
     $ pip install -U supervisor_twiddler
 
 After installing the package, add these lines to your ``supervisord.conf`` file
 to register the twiddler interface:
 
+.. code-block:: ini
+
     [rpcinterface:twiddler]
     supervisor.rpcinterface_factory = supervisor_twiddler.rpcinterface:make_twiddler_rpcinterface
 
 You must restart Supervisor for the twiddler interface to be loaded.
 
-## Usage
+Usage
+-----
 
 There are times when it is useful to be able to dynamically add and remove
 process configurations on a supervisord instance. This is the functionality
@@ -33,12 +40,16 @@ The following Python interpreter session demonstrates the usage.
 First, a `ServerProxy` object must be configured. If supervisord is listening on
 an inet socket, `ServerProxy` configuration is simple:
 
+.. code-block:: python
+
     >>> import xmlrpclib
     >>> s = xmlrpclib.ServerProxy('http://localhost:9001')
 
 If supervisord is listening on a domain socket, `ServerProxy` can be configured
 with `SupervisorTransport`. The URL must still be supplied and be a valid HTTP
 URL to appease ServerProxy, but it is superfluous.
+
+.. code-block:: python
 
     >>> import xmlrpclib
     >>> from supervisor.xmlrpc import SupervisorTransport
@@ -47,6 +58,8 @@ URL to appease ServerProxy, but it is superfluous.
 
 Once `ServerProxy` has been configured appropriately, we can now exercise
 supervisor_twiddler:
+
+.. code-block:: python
 
     >>> s.twiddler.getAPIVersion()
     '0.1'
@@ -70,22 +83,29 @@ not think its quick termination was an error.
 The process was then started and its output read using the normal API commands
 provided by Supervisor.
 
-## API Description
+API Description
+---------------
 
-### Testing the API Version
+Testing the API Version
+-----------------------
 
 All RPC extensions for Supervisor follow a convention where a method called
 `getAPIVersion()` is available. supervisor_twiddler provides this:
+
+.. code-block:: python
 
     twiddler.getAPIVersion()
 
 It is highly recommended that when you develop software that uses
 supervisor_twiddler, you test the API version before making method calls.
 
-### Listing Process Groups
+Listing Process Groups
+----------------------
 
 Process groups are defined in supervisord.conf as group sections. Assume
 `supervisord.conf` contained sections `[group:foo]` and `[group:bar]`:
+
+.. code-block:: python
 
     twiddler.getGroupNames()
 
@@ -93,7 +113,8 @@ The return value would then return an array: `["foo", "bar"]`. It is possible
 to use supervisor_twiddler to add new process groups at runtime, and these
 will also be included in the results returned by `twiddler.getGroupNames()`.
 
-### Adding a New Program to a Group
+Adding a New Program to a Group
+-------------------------------
 
 In supervisord.conf, a `[program:x]` section will result in one or more
 processes, depending on `numprocs` and named by `process_name`.
@@ -101,6 +122,8 @@ processes, depending on `numprocs` and named by `process_name`.
 The `twiddler.addProgramToGroup()` method makes it possible to add a new program
 to a group (resulting in one or more processes) and then control these
 processes as if they had existed originally in `supervisord.conf`.
+
+.. code:: python
 
     twiddler.addProgramToGroup("group_name", "foo",
       {"command": "/usr/bin/foo"})
@@ -130,21 +153,27 @@ If the process you are adding exits quickly, make sure that you set `startsecs`
 to `0`. Otherwise, Supervisor will think the process failed to start and will
 give an abnormal termination error.
 
-### Removing a Process from a Group
+Removing a Process from a Group
+-------------------------------
 
 When processes are no longer needed in the supervisord runtime configuration,
 the `twiddler.removeProcessFromGroup()` method can be used:
+
+.. code:: python
 
     twiddler.removeProcessFromGroup("group_name", "process_name")
 
 To be removed, the process must not be running. It must have terminated on its
 own or have been stopped with `supervisor.stopProcess()`.
 
-### Logging a Message
+Logging a Message
+-----------------
 
 The `twiddler.log()` method allows you to write arbitrary messages to
 Supervisor's main log. When you twiddle with Supervisor's configuration, this
 method is useful for logging messages about what was done.
+
+.. code:: python
 
     twiddler.log("This is an informational message", "INFO")
 
@@ -156,7 +185,8 @@ Log levels are defined in the supervisor.loggers module and at the time of
 writing are: `CRIT` (50), `ERRO` (40), `WARN` (30), `INFO` (20), `DEBG` (10),
 `TRAC` (5), and `BLAT` (3).
 
-## Warnings
+Warnings
+--------
 
 Any changes to the supervisord runtime configuration will not be persisted
 after Supervisor is shut down.
@@ -165,6 +195,7 @@ Your Supervisor instance should never be exposed to the outside world. With
 supervisor_twiddler, anyone with access to the API has the ability to run
 arbitrary commands on the server.
 
-### Author
+Author
+------
 
-[Mike Naberezny](http://github.com/mnaberez)
+`Mike Naberezny <http://github.com/mnaberez>`_
