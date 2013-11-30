@@ -6,10 +6,12 @@ that are not normally possible at runtime.
 
 ## Installation
 
-[Download](http://github.com/mnaberez/supervisor_twiddler/downloads) and
-extract, then install to Python's `site-packages`:
+supervisor_twiddler packages are
+`available on PyPI<http://pypi.python.org/pypi/supervisor_twiddler>`_.
+You download them from there or you can use ``pip`` to
+automatically install or upgrade:
 
-    $ python setup.py install
+    $ pip install -U supervisor_twiddler
 
 After installing the package, add these lines to your ``supervisord.conf`` file
 to register the twiddler interface:
