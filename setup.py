@@ -3,12 +3,14 @@ __version__ = '0.5-dev'
 import os
 import sys
 
-if sys.version_info[:2] < (2, 4) or sys.version_info[0] > 2:
-    msg = ("supervisor_twiddler requires Python 2.4 or later but does not "
-           "work on any version of Python 3.  You are using version %s.  "
-           "Please install using a supported version." % sys.version)
-    sys.stderr.write(msg)
-    sys.exit(1)
+py_version = sys.version_info[:2]
+
+if py_version < (2, 6):
+    raise RuntimeError(
+        'On Python 2, supervisor_twiddler requires Python 2.6 or later')
+elif (3, 0) < py_version < (3, 2):
+    raise RuntimeError(
+        'On Python 3, supervisor_twiddler requires Python 3.2 or later')
 
 from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))

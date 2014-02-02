@@ -1,13 +1,9 @@
-import os
-
 from supervisor.options import UnhosedConfigParser
-from supervisor.options import ProcessGroupConfig
 from supervisor.datatypes import list_of_strings
 from supervisor.states import SupervisorStates
-from supervisor.states import ProcessStates, STOPPED_STATES
+from supervisor.states import STOPPED_STATES
 from supervisor.xmlrpc import Faults as SupervisorFaults
 from supervisor.xmlrpc import RPCError
-from supervisor.http import NOT_DONE_YET
 import supervisor.loggers
 
 API_VERSION = '0.3'
@@ -51,7 +47,7 @@ class TwiddlerNamespaceRPCInterface:
         @return array                Process group names
         """
         self._update('getGroupNames')
-        return self.supervisord.process_groups.keys()
+        return list(self.supervisord.process_groups.keys())
 
     def log(self, message, level=supervisor.loggers.LevelsByName.INFO):
         """ Write an arbitrary message to the main supervisord log.  This is
@@ -95,8 +91,8 @@ class TwiddlerNamespaceRPCInterface:
         options = self.supervisord.options
         try:
             new_configs = options.processes_from_section(parser, section_name, group_name)
-        except ValueError, why:
-            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, why)
+        except ValueError as e:
+            raise RPCError(SupervisorFaults.INCORRECT_PARAMETERS, e)
 
         # check new process names don't already exist in the config
         for new_config in new_configs:

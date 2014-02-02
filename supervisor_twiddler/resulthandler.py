@@ -1,4 +1,5 @@
 from supervisor.dispatchers import RejectEvent
+from supervisor_twiddler.compat import unicode, basestring
 
 def stdin_write_handler(event, response):
     """ A supervisor eventlistener result handler that accepts a

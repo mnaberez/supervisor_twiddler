@@ -1,6 +1,8 @@
 0.5 *Next release*
 
-  Python 2.3 is no longer supported.
+  Dropped support for Python versions before 2.6.
+
+  Added support for Python 3.2 and 3.3.
 
 0.4 (27-Aug-2011)
 
