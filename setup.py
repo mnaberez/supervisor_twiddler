@@ -27,6 +27,12 @@ CLASSIFIERS = [
     'License :: OSI Approved :: BSD License',
     'Natural Language :: English',
     'Operating System :: POSIX',
+    'Programming Language :: Python :: 2',
+    'Programming Language :: Python :: 2.6',
+    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.2',
+    'Programming Language :: Python :: 3.3',
     'Topic :: System :: Boot',
     'Topic :: System :: Systems Administration',
     ]
