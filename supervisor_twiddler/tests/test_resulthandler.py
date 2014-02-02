@@ -10,14 +10,14 @@ class TestStdinWriteHandler(unittest.TestCase):
         event = DummyEvent()
         response = 'OK'
         supervisor_twiddler.resulthandler.stdin_write_handler(event, response)
-        
+
     def test_handler_rejects_event_when_response_is_unexpected(self):
         event = DummyEvent()
         response = 'unexpected'
-        self.assertRaises(RejectEvent, 
+        self.assertRaises(RejectEvent,
                           supervisor_twiddler.resulthandler.stdin_write_handler,
                           event, response)
-    
+
     def test_handler_writes_chars_when_response_is_STDIN(self):
         options = DummyOptions()
         config = DummyPConfig(options, 'cat', 'bin/cat')
@@ -25,10 +25,10 @@ class TestStdinWriteHandler(unittest.TestCase):
         process = DummyProcess(config)
         process.pid = 42
         process.killing = False
-        
+
         event = DummyEvent()
         event.process = process
-        
+
         response = 'STDIN:foobar'
         supervisor_twiddler.resulthandler.stdin_write_handler(event, response)
         self.assertEqual(process.stdin_buffer, 'foobar')
@@ -40,10 +40,10 @@ class TestStdinWriteHandler(unittest.TestCase):
         process = DummyProcess(config)
         process.pid = 42
         process.killing = False
-        
+
         event = DummyEvent()
         event.process = process
-        
+
         response = u'STDIN:foobar'
         supervisor_twiddler.resulthandler.stdin_write_handler(event, response)
         self.assertEqual(process.stdin_buffer, 'foobar')
@@ -55,13 +55,13 @@ class TestStdinWriteHandler(unittest.TestCase):
         process = DummyProcess(config)
         process.pid = None
         process.killing = False
-        
+
         event = DummyEvent()
         event.process = process
-        
+
         response = 'STDIN:foobar'
         supervisor_twiddler.resulthandler.stdin_write_handler(event, response)
-        self.assertEqual(process.stdin_buffer, '')        
+        self.assertEqual(process.stdin_buffer, '')
 
     def test_write_fails_silently_if_process_is_killing(self):
         options = DummyOptions()
@@ -70,13 +70,13 @@ class TestStdinWriteHandler(unittest.TestCase):
         process = DummyProcess(config)
         process.pid = 42
         process.killing = True
-        
+
         event = DummyEvent()
         event.process = process
-        
+
         response = 'STDIN:foobar'
         supervisor_twiddler.resulthandler.stdin_write_handler(event, response)
-        self.assertEqual(process.stdin_buffer, '')       
+        self.assertEqual(process.stdin_buffer, '')
 
     def test_write_fails_silently_if_oserror_during_write(self):
         options = DummyOptions()
@@ -86,13 +86,13 @@ class TestStdinWriteHandler(unittest.TestCase):
         process.pid = 42
         process.killing = False
         process.write_error = True
-        
+
         event = DummyEvent()
         event.process = process
-        
+
         response = 'STDIN:foobar'
         supervisor_twiddler.resulthandler.stdin_write_handler(event, response)
-        self.assertEqual(process.stdin_buffer, '')       
+        self.assertEqual(process.stdin_buffer, '')
 
 def test_suite():
     return unittest.findTestCases(sys.modules[__name__])

@@ -1,13 +1,13 @@
 from supervisor.dispatchers import RejectEvent
 
 def stdin_write_handler(event, response):
-    """ A supervisor eventlistener result handler that accepts a 
-    special 'STDIN:' result and writes what follows to the STDIN 
+    """ A supervisor eventlistener result handler that accepts a
+    special 'STDIN:' result and writes what follows to the STDIN
     of the process associated with the event. """
     if response.startswith("STDIN:"):
         _stdin_write(event.process, response[6:])
     elif response != 'OK':
-        raise RejectEvent(response)        
+        raise RejectEvent(response)
 
 def _stdin_write(process, chars):
     """ Write chars to the stdin of process.  If the process is
