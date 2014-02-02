@@ -1,8 +1,11 @@
 .DS_Store
+.gitignore
 *~
+*.egg
 *.pyc
 *.pyo
 *.swp
+.tox/
 build/
 dist/
-supervisor_twiddler.egg-info/
+*.egg-info/
