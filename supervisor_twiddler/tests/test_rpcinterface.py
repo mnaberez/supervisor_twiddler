@@ -48,7 +48,7 @@ class TestRPCInterface(unittest.TestCase):
 
         self.assertTrue(isinstance(interface,
             rpcinterface.TwiddlerNamespaceRPCInterface))
-        self.assertEquals(supervisord, interface.supervisord)
+        self.assertEqual(supervisord, interface.supervisord)
 
     # Updater
 
@@ -93,7 +93,7 @@ class TestRPCInterface(unittest.TestCase):
 
         names = interface.getGroupNames()
         self.assertTrue(isinstance(names, list))
-        self.assertEquals(0, len(names))
+        self.assertEqual(0, len(names))
 
     def test_getGroupNames_returns_group_names(self):
         pconfig = DummyPConfig(None, 'foo', '/bin/foo')
@@ -106,7 +106,7 @@ class TestRPCInterface(unittest.TestCase):
 
         names = interface.getGroupNames()
         self.assertTrue(isinstance(names, list))
-        self.assertEquals(2, len(names))
+        self.assertEqual(2, len(names))
         names.index('foo')
         names.index('bar')
 
