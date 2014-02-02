@@ -42,13 +42,6 @@ setup(
     maintainer = "Mike Naberezny",
     maintainer_email = "mike@naberezny.com",
     packages = find_packages(),
-    # put data files in egg 'doc' dir
-    data_files=[ ('doc', [
-        'CHANGES.txt',
-        'LICENSE.txt',
-        'README.md',
-        ]
-    )],
     install_requires = ['supervisor >= 3.0a10'],
     include_package_data = True,
     zip_safe = False,
