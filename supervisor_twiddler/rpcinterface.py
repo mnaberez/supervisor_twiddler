@@ -6,7 +6,7 @@ from supervisor.xmlrpc import Faults as SupervisorFaults
 from supervisor.xmlrpc import RPCError
 import supervisor.loggers
 
-API_VERSION = '0.3'
+API_VERSION = '1.0'
 
 class Faults:
     NOT_IN_WHITELIST = 230
