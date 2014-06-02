@@ -12,6 +12,10 @@ elif (3, 0) < py_version < (3, 2):
     raise RuntimeError(
         'On Python 3, supervisor_twiddler requires Python 3.2 or later')
 
+tests_require = []
+if py_version < (3, 3):
+    tests_require.append('mock')
+
 from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -51,6 +55,7 @@ setup(
     maintainer_email = "mike@naberezny.com",
     packages = find_packages(),
     install_requires = ['supervisor >= 3.0a10'],
+    tests_require = tests_require,
     include_package_data = True,
     zip_safe = False,
     namespace_packages = ['supervisor_twiddler'],
