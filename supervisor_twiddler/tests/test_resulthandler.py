@@ -2,6 +2,7 @@ import sys
 import unittest
 import supervisor_twiddler
 import supervisor_twiddler.resulthandler
+from supervisor_twiddler.compat import _b, _u
 from supervisor.tests.base import DummyEvent, DummyOptions, DummyPConfig, DummyProcess
 from supervisor.dispatchers import RejectEvent
 
@@ -44,7 +45,7 @@ class TestStdinWriteHandler(unittest.TestCase):
         event = DummyEvent()
         event.process = process
 
-        response = u'STDIN:foobar'
+        response = _u(_b('STDIN:foobar'))
         supervisor_twiddler.resulthandler.stdin_write_handler(event, response)
         self.assertEqual(process.stdin_buffer, 'foobar')
 
