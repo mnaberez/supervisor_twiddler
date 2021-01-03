@@ -5,9 +5,9 @@ import sys
 
 py_version = sys.version_info[:2]
 
-if py_version < (2, 6):
+if py_version < (2, 7):
     raise RuntimeError(
-        'On Python 2, supervisor_twiddler requires Python 2.6 or later')
+        'On Python 2, supervisor_twiddler requires Python 2.7 or later')
 elif (3, 0) < py_version < (3, 2):
     raise RuntimeError(
         'On Python 3, supervisor_twiddler requires Python 3.2 or later')
@@ -32,7 +32,6 @@ CLASSIFIERS = [
     'Natural Language :: English',
     'Operating System :: POSIX',
     'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.2',

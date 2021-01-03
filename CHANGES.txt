@@ -1,5 +1,6 @@
-1.1.0-dev (Next Release)
+2.0.0-dev (Next Release)
 
+  Dropped support for Python 2.6.
 
 1.0.0 (2-Feb-2014)
 
