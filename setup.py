@@ -14,7 +14,7 @@ elif (3, 0) < py_version < (3, 2):
 
 tests_require = []
 if py_version < (3, 3):
-    tests_require.append('mock')
+    tests_require.append('mock<4.0.0.dev0')
 
 from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
